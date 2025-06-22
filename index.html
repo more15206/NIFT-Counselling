@@ -120,12 +120,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="bg-white rounded-lg shadow-lg p-6 text-center flex flex-col justify-center border-b-4 border-gray-300">
                     <h3 class="text-lg font-semibold text-gray-500">Your Input Common Merit Rank (CMR)</h3>
-                    <p id="display-cmr" class="text-6xl font-extrabold my-4 text-gray-700">8500</p>
+                    <p id="display-cmr" class="text-6xl font-extrabold my-4 text-gray-700">-</p>
                     <p class="text-sm text-gray-600">This is your overall rank among all test-takers nationwide. While it shows your general performance, it's not the primary factor for your admission due to your category status.</p>
                 </div>
                 <div class="bg-white rounded-lg shadow-lg p-6 text-center flex flex-col justify-center border-b-4" style="border-color: #0096C7;">
                     <h3 class="text-lg font-semibold" style="color: #004AAD;">Your Input Category Rank <span class="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full ml-2">YOUR KEY</span></h3>
-                    <p id="display-category-rank" class="text-6xl font-extrabold my-4" style="color: #004AAD;">791</p>
+                    <p id="display-category-rank" class="text-6xl font-extrabold my-4" style="color: #004AAD;">-</p>
                     <p class="text-sm text-gray-600">This is your rank within your specific reservation category (e.g., OBC, SC, ST). This is the critical number that will determine your admission to a reserved seat.</p>
                 </div>
             </div>
@@ -192,11 +192,11 @@
                 <div class="flex flex-wrap justify-center gap-4 mb-6">
                     <div>
                         <label for="cmr-input" class="block mb-2 text-sm font-medium text-gray-900">Your Common Merit Rank (CMR):</label>
-                        <input type="number" id="cmr-input" value="8500" min="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <input type="number" id="cmr-input" value="" min="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     </div>
                     <div>
                         <label for="category-rank-input" class="block mb-2 text-sm font-medium text-gray-900">Your Category Rank:</label>
-                        <input type="number" id="category-rank-input" value="791" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <input type="number" id="category-rank-input" value="" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     </div>
                     <div>
                         <label for="campus-select" class="block mb-2 text-sm font-medium text-gray-900">Select a Campus:</label>
@@ -271,7 +271,7 @@
                 <div class="chart-container">
                     <canvas id="cutoffChart"></canvas>
                 </div>
-                <p id="chart-explanation" class="text-sm text-center text-gray-600 mt-4">The red dashed line shows your **effective rank for analysis** (<span id="current-category-rank">791</span>). This rank is determined by your "Actual Category" selection (e.g., Common Merit Rank for General, Category Rank for others). If a bar representing a specific category and course extends past this line, it means the simulated closing rank for that category in the selected year was higher than your effective rank, indicating a strong chance of admission for that specific program and category. **Note: 2025 data is an expected/simulated projection.**</p>
+                <p id="chart-explanation" class="text-sm text-center text-gray-600 mt-4">The red dashed line shows your **effective rank for analysis** (<span id="current-category-rank">-</span>). This rank is determined by your "Actual Category" selection (e.g., Common Merit Rank for General, Category Rank for others). If a bar representing a specific category and course extends past this line, it means the simulated closing rank for that category in the selected year was higher than your effective rank, indicating a strong chance of admission for that specific program and category. **Note: 2025 data is an expected/simulated projection.**</p>
                 <div id="chance-indicator" class="mt-6 p-4 rounded-lg text-center text-lg font-semibold" style="background-color: #E0F7FA; color: #00796B;">
                     <p><span id="chance-message">Update the chart to see your admission prospects!</span></p>
                 </div>
@@ -1079,7 +1079,7 @@
             description: 'Applies fashion principles to interior spaces, focusing on aesthetics, functionality, and trend analysis in residential and commercial design contexts.'
         },
         'Knitwear Design': {
-            icon: '�',
+            icon: '🧶',
             description: 'Specializes in the design, development, and production of knitted garments and products. Covers yarn technology, knitting techniques, and trend forecasting.'
         },
         'Leather Design': {
@@ -1110,27 +1110,31 @@
 
     // Updates the displayed CMR and Category Ranks from input fields
     function updateDisplayedRanks() {
-        displayCmr.textContent = cmrInput.value;
-        displayCategoryRank.textContent = categoryRankInput.value;
+        // Use a default value of 0 or NaN if the input is empty or invalid
+        const cmrValue = cmrInput.value === '' ? 0 : parseInt(cmrInput.value, 10);
+        const categoryRankValue = categoryRankInput.value === '' ? 0 : parseInt(categoryRankInput.value, 10);
+
+        displayCmr.textContent = cmrValue === 0 ? '-' : cmrValue;
+        displayCategoryRank.textContent = categoryRankValue === 0 ? '-' : categoryRankValue;
 
         const selectedApplicantCategory = applicantCategorySelect.value;
         // Dynamically choose which rank to use based on the "Your Actual Category" selection
         if (selectedApplicantCategory === 'General') {
-            currentApplicantRank = parseInt(cmrInput.value, 10);
+            currentApplicantRank = cmrValue;
             // Update the span to clearly indicate which rank is being used for analysis
-            currentCategoryRankSpan.textContent = `${cmrInput.value} (CMR)`; 
+            currentCategoryRankSpan.textContent = cmrValue === 0 ? '-' : `${cmrValue} (CMR)`; 
         } else {
-            currentApplicantRank = parseInt(categoryRankInput.value, 10);
+            currentApplicantRank = categoryRankValue;
             // Update the span to clearly indicate which rank is being used for analysis
-            currentCategoryRankSpan.textContent = `${categoryRankInput.value} (Category)`; 
+            currentCategoryRankSpan.textContent = categoryRankValue === 0 ? '-' : `${categoryRankValue} (Category)`; 
         }
     }
 
     // Calculates and displays admission chances
     function updateChanceIndicator(campus, year, applicantCategory, applicantRank, selectedProgram) {
         const campusYearData = cutoffData[campus]?.[year];
-        if (!campusYearData || !applicantCategory) {
-            chanceMessage.textContent = "Please select a campus, year, and your actual category to get an assessment.";
+        if (!campusYearData || !applicantCategory || applicantRank === 0) { // Added check for applicantRank being 0
+            chanceMessage.textContent = "Please enter your ranks and select a campus, year, and your actual category to get an assessment.";
             chanceIndicator.style.backgroundColor = '#E0F7FA'; // Default light blue
             chanceIndicator.style.color = '#00796B'; // Default dark cyan
             return;
@@ -1646,4 +1650,3 @@
 </script>
 </body>
 </html>
-�
